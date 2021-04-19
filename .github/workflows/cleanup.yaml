@@ -1,0 +1,65 @@
+name: Clean up
+
+on:
+  # Enable "pull_request" for testing
+  # pull_request:
+  # daily jobs
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  cleanup:
+    name: Cleanup gh-pages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the gh-pages branch
+        uses: actions/checkout@v2
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - name: Install markdown tool
+        run: |
+          sudo apt-get update
+          sudo apt-get install markdown
+
+      - name: Cleanup, squash and push
+        run: |
+          # delete the documentation if the corresponding branch is deleted
+          for dir in $(find gmt-china -mindepth 2 -maxdepth 2); do
+            # directory is "user/repository/branch"
+            repo=$(dirname $dir)
+            branch=$(basename $dir)
+            # the "git ls-remote" command return nothing if a branch is not found
+            if [[ ! $(git ls-remote --heads https://github.com/${repo} ${branch}) ]]; then
+              echo "Deleting directory $dir..."
+              rm -rvf $dir
+            fi
+          done
+
+          # Make some changes
+          touch .nojekyll
+
+          # generate TOC
+          echo "## List of documentation for preview:" > index.md
+          for branch in $(find gmt-china -mindepth 2 -maxdepth 2); do
+            echo "- [$branch](https://gmt-china.org/sitepreview/$branch)" >> index.md
+          done
+          # convert index.md to index.html
+          markdown index.md > index.html
+          rm -f index.md
+
+          # Configure git to be the GitHub Actions account
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          # Commit changes
+          git add -A .
+          git status
+          git commit --allow-empty -m "Commit changes"
+
+          # Squash all commits into one
+          git reset $(git commit-tree HEAD^{tree} -m "Autosquash all commits by scheduled jobs")
+
+          # Push changes
+          git push -fq origin gh-pages 2>&1 > /dev/null
