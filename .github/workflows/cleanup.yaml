@@ -44,7 +44,7 @@ jobs:
           # generate TOC
           echo "## List of documentation for preview:" > index.md
           for branch in $(find gmt-china -mindepth 2 -maxdepth 2); do
-            echo "- [$branch](https://gmt-china.org/sitepreview/$branch)" >> index.md
+            echo "- [$branch](https://gmt-china.github.io/sitepreview/$branch)" >> index.md
           done
           # convert index.md to index.html
           markdown index.md > index.html
