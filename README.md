@@ -15,7 +15,7 @@ with the preview URL link.
 
 The URL scheme is:
 
-    https://gmt-china.org/sitepreview/gmt-china/<repository_name>/<PR_branch_name>
+    https://gmt-china.github.io/sitepreview/gmt-china/<repository_name>/<PR_branch_name>
 
 ## Cleanup
 
