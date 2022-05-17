@@ -13,7 +13,7 @@ workflow is triggered in PRs. It builds and pushes the documentation to the
 `gh-pages` branch of this repository, and creates/updates a comment
 with the preview URL link.
 
-The URL scheme is:
+The preview URL scheme is:
 
     https://gmt-china.github.io/sitepreview/gmt-china/<repository_name>/<PR_branch_name>
 
